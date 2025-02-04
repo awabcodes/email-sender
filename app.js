@@ -25,6 +25,7 @@ app.use(express.json());
 app.use(
   cors({
     origin: process.env.CORS_CLIENT_URL,
+    preflightContinue: true,
   })
 );
 
