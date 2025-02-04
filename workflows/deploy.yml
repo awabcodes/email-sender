@@ -1,0 +1,45 @@
+name: Deploy Email Sender
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the latest code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step 2: Set up Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18" # Specify your Node.js version
+
+      # Step 3: Load environment variables from GitHub Secrets
+      - name: Set environment variables from GitHub Secrets
+        run: |
+          echo "FTP_HOST=${{ secrets.FTP_HOST }}" >> $GITHUB_ENV
+
+      # Step 4: Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # Step 5: Run build script
+      - name: Build
+        run: npm run build # Assumes there's a build script in package.json
+
+      # Step 6: Deploy built files via FTP
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./dist/ # The local directory where the build output is located (adjust if necessary)
+          server-dir: ${{ secrets.FTP_PATH }} # The remote directory on the server
+          protocol: ftps # Change to 'ftps' for secure FTP if needed
