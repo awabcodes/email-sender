@@ -3,6 +3,8 @@ const cors = require("cors");
 const express = require("express");
 const winston = require("winston");
 
+require("dotenv").config();
+
 const logger = winston.createLogger({
   level: "info",
   format: winston.format.combine(
@@ -22,7 +24,7 @@ app.use(express.json());
 
 app.use(
   cors({
-    origin: process.env.CLIENT_URL,
+    origin: process.env.CORS_CLIENT_URL,
   })
 );
 
@@ -38,18 +40,18 @@ app.post("/email-sender/send", (req, res) => {
   });
 
   let transporter = nodemailer.createTransport({
-    host: process.env.HOST,
-    port: process.env.PORT,
-    secure: false,
+    host: process.env.SMTP_HOST,
+    port: process.env.SMTP_PORT,
+    secure: true,
     auth: {
-      user: process.env.USER,
-      pass: process.env.PASS,
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
     },
   });
 
   let mail = {
-    from: `"System" <${process.env.FROM_EMAIL}>`,
-    to: process.env.TO_EMAIL,
+    from: `"System" <${process.env.SMTP_FROM_EMAIL}>`,
+    to: process.env.SMTP_TO_EMAIL,
     subject: process.env.EMAIL_SUBJECT,
     replyTo: req.body.email,
     html: emailBody,
