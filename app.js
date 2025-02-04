@@ -7,18 +7,22 @@ const app = express();
 // Parse JSON bodies (as sent by API clients)
 app.use(express.json());
 
-app.use(cors());
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL,
+  })
+);
 
 app.post("/send", (req, res) => {
   const emailBody = "<h1>Hello World</h1>";
 
   let transporter = nodemailer.createTransport({
-    host: "smtp.example.com",
-    port: 587,
+    host: process.env.HOST,
+    port: process.env.PORT,
     secure: false,
     auth: {
-      user: "user",
-      pass: "pass",
+      user: process.env.USER,
+      pass: process.env.PASS,
     },
   });
 
