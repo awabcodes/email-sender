@@ -14,7 +14,13 @@ app.use(
 );
 
 app.post("/send", (req, res) => {
-  const emailBody = "<h1>Hello World</h1>";
+  let emailBody = "<h2>Submission</h2>";
+
+  Object.keys(req.body).forEach((key) => {
+    emailBody += `<p><strong>${toTitleCase(key)}:</strong> ${
+      req.body[key]
+    }</p>`;
+  });
 
   let transporter = nodemailer.createTransport({
     host: process.env.HOST,
@@ -27,10 +33,10 @@ app.post("/send", (req, res) => {
   });
 
   let mail = {
-    from: '"name" <from@example.com>',
-    to: "to@example.com",
-    subject: "Subject",
-    text: "Hello",
+    from: `"System" <${process.env.FROM_EMAIL}>`,
+    to: process.env.TO_EMAIL,
+    subject: process.env.EMAIL_SUBJECT,
+    replyTo: req.body.email,
     html: emailBody,
   };
 
@@ -49,3 +55,7 @@ app.post("/send", (req, res) => {
 app.listen(3000, () => {
   console.log("Server started on port 3000");
 });
+
+function toTitleCase(str) {
+  return str.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase());
+}
