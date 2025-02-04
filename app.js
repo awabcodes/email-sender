@@ -13,7 +13,7 @@ app.use(
   })
 );
 
-app.post("/send", (req, res) => {
+app.post("/email-sender/send", (req, res) => {
   let emailBody = "<h2>Submission</h2>";
 
   Object.keys(req.body).forEach((key) => {
