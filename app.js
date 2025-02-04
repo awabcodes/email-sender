@@ -1,6 +1,19 @@
 const nodemailer = require("nodemailer");
 const cors = require("cors");
 const express = require("express");
+const winston = require("winston");
+
+const logger = winston.createLogger({
+  level: "info",
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.json()
+  ),
+  transports: [
+    new winston.transports.Console(),
+    new winston.transports.File({ filename: "email-sender.log" }),
+  ],
+});
 
 const app = express();
 
@@ -14,6 +27,8 @@ app.use(
 );
 
 app.post("/email-sender/send", (req, res) => {
+  logger.info("Email Request Received", { body: req.body });
+
   let emailBody = "<h2>Submission</h2>";
 
   Object.keys(req.body).forEach((key) => {
@@ -42,18 +57,17 @@ app.post("/email-sender/send", (req, res) => {
 
   transporter.sendMail(mail, (error, info) => {
     if (error) {
-      console.log(error);
+      logger.error("Email Send Error", { response: error });
       res.status(500).send({ result: "Failed" });
     }
-    console.log("The message was sent!");
-    console.log(info);
+    logger.info("Email Sent", { response: info });
     res.status(200).send({ result: "Success" });
   });
 });
 
 // Start Server
 app.listen(3000, () => {
-  console.log("Server started on port 3000");
+  logger.info("Server started on port 3000");
 });
 
 function toTitleCase(str) {
